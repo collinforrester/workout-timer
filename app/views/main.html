@@ -1,0 +1,36 @@
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <a class="brand" href="#">Title</a>
+        <ul class="nav">
+            <li>
+                <a href="#/">Home</a>
+            </li>
+            <li>
+                <a href="#/how">How To Use</a>
+            </li>
+            <li>
+                <a href="#/setup">Setup</a>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class='container-fluid'>
+  <button class='btn-primary btn' ng-disabled='inProgress' ng-click='start(0)'>Start</button>
+  <button class='btn' ng-click='reset()'>Reset</button>
+  <h3>Current exercise</h3>
+  <div class='current-exercise'>
+    {{currentExercise.title}} - time left - {{currentTimeLeft}}
+  </div>
+  <ul>
+    <li ng-class="{true:'muted', false:''}[exercise.complete]" ng-repeat="exercise in exercises">
+        {{exercise.title}} for {{exercise.length}} seconds
+    </li>
+  </ul>
+
+  <form ng-submit="addExercise()" class="form-inline">
+    <input required type="text" ng-model='newExercise.title' class="" placeholder="Exercise">
+    <input required min="1" type="number" ng-model='newExercise.length' class="input-medium" placeholder="Duration (seconds)">
+    <button type='submit' class="btn btn-primary"><i class='icon-plus icon-white'></i></button>
+  </form>
+</div>
+<audio id='quiet-ring' src="sounds/quiet-bell-ring.mp3" preload="auto"></audio>
