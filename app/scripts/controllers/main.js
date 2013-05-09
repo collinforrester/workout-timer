@@ -12,6 +12,19 @@ angular.module('workouttimerApp')
       'complete': false
     }];
 
+    $scope.getReady = function() {
+      $scope.prepare = true;
+      $scope.iterations = 5;
+      $timeout(function getReadyCountdown() {
+        if( --$scope.iterations === 0 ) {
+          $scope.prepare = false;
+          $scope.start(0);
+        } else {
+          $timeout( getReadyCountdown, 1000);
+        }
+      }, 1000);
+    };
+
     $scope.$on('Exercise.Done', function(event, index) {
       if( index < $scope.exercises.length - 1 ) {
         $scope.start(++index);
@@ -21,6 +34,14 @@ angular.module('workouttimerApp')
         $scope.inProgress = false;
       }
     });
+
+    $scope.edit = function(index) {
+
+    };
+
+    $scope.delete = function(index) {
+      $scope.exercises.splice(index,1);
+    };
 
     $scope.reset = function() {
       for(var i = 0; i < $scope.exercises.length; i++) {
