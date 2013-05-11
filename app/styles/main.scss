@@ -6,3 +6,29 @@
 .input-mini {
 	width: 30px;
 }
+.exercise-list {
+	list-style: none;
+	margin-left: -20px;
+}
+.timer {
+	font-family: 'Orbitron';
+	font-size: 7em;
+	line-height: 1em;
+	color: rgb(223, 76, 76);
+}
+.edit {
+	// margin-bottom: 10px;
+	// margin-top: 10px;
+	padding-top: 5px;
+
+}
+.edit-form {
+	margin-left: 20px;
+}
+// bootstrap overrides
+.input-xlarge {
+	width: 266px;
+}
+form {
+	margin: 0;
+}

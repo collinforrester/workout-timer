@@ -1,24 +1,33 @@
 <div class='container-fluid'>
-  <button class='btn-primary btn' ng-disabled='inProgress' ng-click='getReady()'>Start</button>
+  <button class='btn-primary btn' ng-hide='inProgress' ng-click='getReady()'>Start <i class="icon-play icon-white"></i></button>
+  <button class='btn' ng-show='inProgress' ng-click='pause()'>Pause <i class="icon-pause"></i></button>
   <button class='btn' ng-click='reset()'>Reset</button>
   <h3>Current exercise</h3>
   <div class='current-exercise'>
-    {{currentExercise.title}} - time left - {{currentTimeLeft}}
+    {{currentExercise.title}} - time left -
   </div>
+  <div class='timer'>{{displayTime}}</div>
   <div ng-show="prepare">Get ready! {{iterations}}...</div>
-  <form ng-submit="addExercise()" class="form-inline">
-  <ul>
+  <form class='span6' ng-submit="addExercise()" class="form-inline">
+    <input required type="text" ng-model='newExercise.title' class="input-xlarge"> for
+    <input required min="1" type="number" ng-model='newExercise.length' class="input-mini"> seconds
+    <button type='submit' class="btn btn-primary"><i class='icon-plus icon-white'></i></button>
+  </form>
+  <ul class='exercise-list'>
     <li ng-class="{true:'muted', false:''}[exercise.complete]" class='span12' ng-repeat="exercise in exercises">
-        {{exercise.title}} for {{exercise.length}} seconds <button ng-click='edit($index)' class='btn'><i class="icon-edit"></i></button> <button ng-click="delete($index)" class='btn'><i class="icon-trash"></i></button>
+      <div ng-hide='isEditing == $index' class='edit'>
+        <span class='span6' ng-click='edit($index)'>{{exercise.title}} for {{exercise.length}} seconds<span class='pull-right'><button ng-click="delete($index)" class='btn btn-danger'><i class="icon-trash icon-white"></i></button></span></span>
+      </div>
+      <div ng-show='isEditing == $index' class='edit edit-form'>
+        <form ng-submit="updateExercise()" class="form-inline">
+          <input required type="text" ng-model='exercise.title' class="input-xlarge"> for
+          <input required min="1" type="number" ng-model='exercise.length' class="input-mini"> seconds
+          <button type='submit' class="btn btn-success"><i class='icon-ok icon-white'></i></button>
+        </form>
+      </div>
     </li>
 
-    <li>
-      <input required type="text" ng-model='newExercise.title' class="input-medium"> for
-      <input required min="1" type="number" ng-model='newExercise.length' class="input-mini"> seconds
-      <button type='submit' class="btn btn-primary"><i class='icon-plus icon-white'></i></button>
-    </li>
   </ul>
-  </form>
 
 
 </div>

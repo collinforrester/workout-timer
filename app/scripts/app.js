@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('workouttimerApp', [])
+angular.module('workouttimerApp', ['Scope.safeApply'])
   .config(function ($routeProvider) {
     $routeProvider
       .when('/', {

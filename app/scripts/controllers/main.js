@@ -2,15 +2,33 @@
 
 angular.module('workouttimerApp')
   .controller('MainCtrl', function ($scope, $timeout) {
-    $scope.exercises = [{
-      'title': 'stretch',
-      'length': 3,
-      'complete': false
-    }, {
-      'title': 'stretch',
-      'length': 3,
-      'complete': false
-    }];
+
+    $scope.currentTimeLeft = $scope.displayTime = 0;
+
+    $scope.newExercise = {
+      length: 45
+    };
+
+    $scope.exercises = [];
+    // $scope.exercises = [{
+    //   'title': 'stretch',
+    //   'length': 3,
+    //   'complete': false
+    // }, {
+    //   'title': 'stretch',
+    //   'length': 3,
+    //   'complete': false
+    // }];
+
+    $scope.$watch('currentTimeLeft', function(n) {
+      if( n > 59 ) {
+        var minutes = Math.floor(n / 60);
+        var seconds = n - minutes * 60;
+        $scope.displayTime = ((''+minutes).length > 1 ? minutes : '0' + minutes) + ':' + ((''+seconds).length > 1 ? seconds : '0' + seconds);
+      } else {
+        $scope.displayTime = '00:' + ((''+n).length > 1 ? n : '0' + n);
+      }
+    });
 
     $scope.getReady = function() {
       $scope.prepare = true;
@@ -35,11 +53,16 @@ angular.module('workouttimerApp')
       }
     });
 
-    $scope.edit = function(index) {
+    $scope.updateExercise = function() {
+      $scope.isEditing = null;
+    };
 
+    $scope.edit = function(index) {
+      $scope.isEditing = index;
     };
 
     $scope.delete = function(index) {
+      $scope.currentTimeLeft -= $scope.exercises[index].length;
       $scope.exercises.splice(index,1);
     };
 
@@ -51,17 +74,21 @@ angular.module('workouttimerApp')
     };
 
     $scope.addExercise = function() {
-      $scope.exercises.push(angular.extend($scope.newExercise, {
-        'complete':false
-      }));
+      $scope.$safeApply(function() {
+        $scope.exercises.push(angular.extend($scope.newExercise, {
+          'complete':false
+        }));
+      });
+      $scope.currentTimeLeft += $scope.newExercise.length;
+      $scope.newExercise = {
+        length: 45
+      };
     };
 
     $scope.start = function(index) {
       $scope.inProgress = true;
       // set it as the current exercise
       $scope.currentExercise = $scope.exercises[index];
-      // and start the timer
-      $scope.currentTimeLeft = $scope.currentExercise.length;
       $timeout(function countdown() {
         if( --$scope.currentTimeLeft === 0 ) {
           $scope.exercises[index].complete = true;
