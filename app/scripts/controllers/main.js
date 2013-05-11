@@ -1,57 +1,47 @@
 'use strict';
 
+/* globals _ */
 angular.module('workouttimerApp')
   .controller('MainCtrl', function ($scope, $timeout) {
 
-    $scope.currentTimeLeft = $scope.displayTime = 0;
+    $scope.totalTimeLeft = $scope.currentExerciseDisplayTime = $scope.exerciseTimeLeft = $scope.totalDisplayTime = 0;
 
     $scope.newExercise = {
-      length: 45
+      length: 2
     };
 
     $scope.exercises = [];
-    // $scope.exercises = [{
-    //   'title': 'stretch',
-    //   'length': 3,
-    //   'complete': false
-    // }, {
-    //   'title': 'stretch',
-    //   'length': 3,
-    //   'complete': false
-    // }];
 
-    $scope.$watch('currentTimeLeft', function(n) {
-      if( n > 59 ) {
-        var minutes = Math.floor(n / 60);
-        var seconds = n - minutes * 60;
-        $scope.displayTime = ((''+minutes).length > 1 ? minutes : '0' + minutes) + ':' + ((''+seconds).length > 1 ? seconds : '0' + seconds);
-      } else {
-        $scope.displayTime = '00:' + ((''+n).length > 1 ? n : '0' + n);
-      }
+    $scope.$watch('totalTimeLeft', function(n) {
+      $scope.totalDisplayTime = timeFormatter(n);
+      $scope.currentExerciseDisplayTime = timeFormatter($scope.exerciseTimeLeft);
     });
-
-    $scope.getReady = function() {
-      $scope.prepare = true;
-      $scope.iterations = 5;
-      $timeout(function getReadyCountdown() {
-        if( --$scope.iterations === 0 ) {
-          $scope.prepare = false;
-          $scope.start(0);
-        } else {
-          $timeout( getReadyCountdown, 1000);
-        }
-      }, 1000);
-    };
 
     $scope.$on('Exercise.Done', function(event, index) {
       if( index < $scope.exercises.length - 1 ) {
-        $scope.start(++index);
+        $scope.start();
       } else {
         // play the ring
         document.getElementById('quiet-ring').play();
         $scope.inProgress = false;
       }
     });
+
+    function timeFormatter(n) {
+      var formattedTime = '';
+      if( n > 59 ) {
+        var minutes = Math.floor(n / 60);
+        var seconds = n - minutes * 60;
+        formattedTime = ((''+minutes).length > 1 ? minutes : '0' + minutes) + ':' + ((''+seconds).length > 1 ? seconds : '0' + seconds);
+      } else {
+        formattedTime = '00:' + ((''+n).length > 1 ? n : '0' + n);
+      }
+      return formattedTime;
+    }
+
+    $scope.pause = function() {
+      $scope.inProgress = false;
+    };
 
     $scope.updateExercise = function() {
       $scope.isEditing = null;
@@ -62,13 +52,14 @@ angular.module('workouttimerApp')
     };
 
     $scope.delete = function(index) {
-      $scope.currentTimeLeft -= $scope.exercises[index].length;
+      $scope.totalTimeLeft -= $scope.exercises[index].length;
       $scope.exercises.splice(index,1);
     };
 
     $scope.reset = function() {
       for(var i = 0; i < $scope.exercises.length; i++) {
         $scope.exercises[i].complete = false;
+        $scope.totalTimeLeft += $scope.exercises[i].length;
       }
       $scope.inProgress = false;
     };
@@ -79,18 +70,28 @@ angular.module('workouttimerApp')
           'complete':false
         }));
       });
-      $scope.currentTimeLeft += $scope.newExercise.length;
+      $scope.totalTimeLeft += $scope.newExercise.length;
       $scope.newExercise = {
-        length: 45
+        length: 2
       };
     };
 
-    $scope.start = function(index) {
+    $scope.start = function() {
       $scope.inProgress = true;
-      // set it as the current exercise
+
+      // start at the first one that isn't done
+      // this is probably really inefficient. O(n) !!!!!!
+      var firstIncomplete = _.findWhere($scope.exercises, {complete: false});
+      var index = _.indexOf( $scope.exercises, firstIncomplete );
+      console.log('working on exercise ' + index, firstIncomplete );
       $scope.currentExercise = $scope.exercises[index];
+      $scope.exerciseTimeLeft = $scope.currentExercise.length;
       $timeout(function countdown() {
-        if( --$scope.currentTimeLeft === 0 ) {
+        if(!$scope.inProgress) {
+          return;
+        }
+        --$scope.totalTimeLeft;
+        if(--$scope.exerciseTimeLeft <= 0 ) {
           $scope.exercises[index].complete = true;
           $scope.$broadcast('Exercise.Done', index);
         } else {

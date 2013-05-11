@@ -1,13 +1,11 @@
 <div class='container-fluid'>
-  <button class='btn-primary btn' ng-hide='inProgress' ng-click='getReady()'>Start <i class="icon-play icon-white"></i></button>
+  <button class='btn-primary btn' ng-disabled='exercises.length < 1' ng-hide='inProgress' ng-click='start()'>Start <i class="icon-play icon-white"></i></button>
   <button class='btn' ng-show='inProgress' ng-click='pause()'>Pause <i class="icon-pause"></i></button>
   <button class='btn' ng-click='reset()'>Reset</button>
   <h3>Current exercise</h3>
-  <div class='current-exercise'>
-    {{currentExercise.title}} - time left -
-  </div>
-  <div class='timer'>{{displayTime}}</div>
-  <div ng-show="prepare">Get ready! {{iterations}}...</div>
+  <div class='current-exercise span12'>{{currentExercise.title}}</div>
+  <div><span class='timer-label'>Exercise time:</span> <span class='timer '>{{currentExerciseDisplayTime}}</span></div>
+  <div><span class='timer-label'>Total time:</span> <span class='timer '>{{totalDisplayTime}}</span></div>
   <form class='span6' ng-submit="addExercise()" class="form-inline">
     <input required type="text" ng-model='newExercise.title' class="input-xlarge"> for
     <input required min="1" type="number" ng-model='newExercise.length' class="input-mini"> seconds
@@ -16,7 +14,7 @@
   <ul class='exercise-list'>
     <li ng-class="{true:'muted', false:''}[exercise.complete]" class='span12' ng-repeat="exercise in exercises">
       <div ng-hide='isEditing == $index' class='edit'>
-        <span class='span6' ng-click='edit($index)'>{{exercise.title}} for {{exercise.length}} seconds<span class='pull-right'><button ng-click="delete($index)" class='btn btn-danger'><i class="icon-trash icon-white"></i></button></span></span>
+        <span class='span6' ng-click='edit($index)'>{{exercise.title}} for {{exercise.length}} seconds<span ng-hide='inProgress' class='pull-right'><button ng-click="delete($index)" class='btn btn-danger'><i class="icon-trash icon-white"></i></button></span></span>
       </div>
       <div ng-show='isEditing == $index' class='edit edit-form'>
         <form ng-submit="updateExercise()" class="form-inline">
@@ -26,8 +24,8 @@
         </form>
       </div>
     </li>
-
   </ul>
+  <p class='muted span6' ng-show='exercises.length > 0'>Click to edit</p>
 
 
 </div>
